@@ -45,13 +45,13 @@ if (!isset($_SESSION["login"])) {
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-      <h1 class="h3 mb-0 text-gray-800">Daftar Peminjaman Barang</h1>
+      <h1 class="h3 mb-0 text-gray-800">Daftar Pengembalian Barang</h1>
       <div class="my-2"></div>
-      <a href="tambah-pinjam.php" class="btn btn-info btn-icon-split">
+      <a href="tambah-balik.php" class="btn btn-info btn-icon-split">
         <span class="icon text-white-50">
           <i class="fas fa-info-circle"></i>
         </span>
-        <span class="text">Pinjam Barang</span>
+        <span class="text">Pengembalian Barang</span>
       </a>
     </div>
 
@@ -70,26 +70,26 @@ if (!isset($_SESSION["login"])) {
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
                     <th>User</th>
-                    <th>Tanggal Pinjam</th>
+                    <th>Tanggal balik</th>
                     <th>Status</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php
-                  $sql = mysqli_query($koneksi, "SELECT * FROM peminjaman INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user");
+                  $sql = mysqli_query($koneksi, "SELECT * FROM pengembalian INNER JOIN peminjaman ON pengembalian.id_balik=peminjaman.id_pinjam INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user");
                   $no = 1;
                   while ($data = mysqli_fetch_assoc($sql)) {
                   ?>
                     <tr>
                       <td><?= $no++; ?></td>
                       <td><?= $data['nama_barang']; ?></td>
-                      <td><?= $data['jumlah_pinjam']; ?></td>
+                      <td><?= $data['jumlah_balik']; ?></td>
                       <td><?= $data['nama']; ?></td>
-                      <td><?= $data['tanggal_pinjam']; ?></td>
+                      <td><?= $data['tanggal_balik']; ?></td>
                       <td><?= $data['status']; ?></td>
                       <td>
-                        <a href="setuju-pinjam.php?id=<?= $data['id_pinjam']; ?>" class="btn btn-info btn-icon-split btn-sm">
+                        <a href="setuju-balik.php?id=<?= $data['id_balik']; ?>" class="btn btn-info btn-icon-split btn-sm">
                           <span class="icon text-white-50">
                             <i class="fas fa-info-circle"></i>
                           </span>

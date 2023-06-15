@@ -1,11 +1,10 @@
 <?php
 require 'functions-admin.php';
+$koneksi = koneksi();
 
 if (!isset($_SESSION["login"])) {
   header("Location: login.php");
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -31,6 +30,9 @@ if (!isset($_SESSION["login"])) {
   <!-- Custom styles for this page -->
   <link href="../sbAdmin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
 </head>
 
 <body id="page-top">
@@ -42,14 +44,8 @@ if (!isset($_SESSION["login"])) {
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-      <h1 class="h3 mb-0 text-gray-800">Daftar Barang Inventaris</h1>
+      <h1 class="h3 mb-0 text-gray-800">Form Pengembalian Barang</h1>
       <div class="my-2"></div>
-      <a href="tambah-barang.php" class="btn btn-info btn-icon-split">
-        <span class="icon text-white-50">
-          <i class="fas fa-info-circle"></i>
-        </span>
-        <span class="text">Tambah Data Barang</span>
-      </a>
     </div>
 
     <!-- Content Row -->
@@ -59,48 +55,44 @@ if (!isset($_SESSION["login"])) {
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-bordered" id="data-Table" width="100%" cellspacing="0">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nama Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Masuk</th>
-                    <th width=20%>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <form method="POST">
+              <div class="mb-3">
+                <label for="select-barang" class="form-label">Nama Barang</label>
+                <select class="form-select" aria-label=".form-select-lg example" id="select-barang" placeholder="Pick a state..." name="id_p">
+                  <option value="">-- Pilih Barang --</option>
                   <?php
-                  $sql = mysqli_query($koneksi, "SELECT * FROM stok_barang");
-                  $no = 1;
-                  while ($data = mysqli_fetch_assoc($sql)) {
+                  $sq = $koneksi->query("select * from stok_barang");
+                  while ($data = $sq->fetch_assoc()) {
+                    echo "<option value='$data[id_produk]'>$data[nama_barang]</option>";
+                  }
                   ?>
-                    <tr>
-                      <td><?= $no++; ?></td>
-                      <td><?= $data['nama_barang']; ?></td>
-                      <td><?= $data['jumlah_barang']; ?></td>
-                      <td><?= $data['tanggal_masuk']; ?></td>
-                      <td>
-                        <a href="edit-barang.php?id=<?= $data['id_produk']; ?>" class="btn btn-info btn-icon-split btn-sm">
-                          <span class="icon text-white-50">
-                            <i class="fas fa-info-circle"></i>
-                          </span>
-                          <span class="text">Edit</span>
-                        </a>
-                        <a href="hapus-barang.php?id=<?= $data['id_produk']; ?>" class="btn btn-danger btn-icon-split btn-sm">
-                          <span class="icon text-white-50">
-                            <i class="fas fa-trash"></i>
-                          </span>
-                          <span class="text">Hapus</span>
-                        </a>
-                      </td>
-                    <?php } ?>
-                    </tr>
-                    </tr>
-                </tbody>
-              </table>
-            </div>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputjumlah1" class="form-label">Jumlah Barang Yang Dipinjam</label>
+                <input type="jumlah" class="form-control" id="exampleInputjumlah1" aria-describedby="jumlahHelp" name="jumlah_pinjam" required>
+              </div>
+              <div class="mb-3">
+                <label for="select-user" class="form-label">UKM Peminjam</label>
+                <select class="form-select" aria-label=".form-select-lg example" id="select-user" placeholder="Pick a state..." name="id_u">
+                  <option value="">-- Pilih Nama UKM --</option>
+                  <?php
+
+                  $sq = $koneksi->query("select * from user");
+                  while ($data = $sq->fetch_assoc()) {
+                    echo "<option value='$data[id_user]'>$data[nama]</option>";
+                  }
+                  ?>
+
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputTangal" class="form-label">Tanggal Pinjam</label>
+                <input type="date" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required>
+              </div>
+              <input type="hidden" name="status" value="Belum Diproses">
+              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+            </form>
           </div>
         </div>
 
@@ -113,6 +105,34 @@ if (!isset($_SESSION["login"])) {
 
   </div>
   <!-- End of Main Content -->
+
+  <?php
+  if (isset($_POST["simpan"])) {
+    $status = 'Belum Terproses';
+
+    if ($data['jumlah_barang'] > 0) {
+      $s = mysqli_query($koneksi, "INSERT INTO peminjaman 
+    (id_produk,id_user,jumlah_pinjam,tanggal_pinjam,`status`) VALUES 
+    ('$_POST[id_p]','$_POST[id_u]','$_POST[jumlah_pinjam]','$_POST[tanggal_pinjam]','$status')")
+        or die(mysqli_error($koneksi));
+
+      echo "
+      <script>
+        alert('data berhasil diubah!');
+        document.location.href = 'daftar-pinjam.php';
+      </script>
+    ";
+    } else {
+      echo "
+      <script>
+        alert('Barang Kosong!');
+        document.location.href = 'daftar-pinjam.php';
+      </script>
+    ";
+    }
+  }
+
+  ?>
 
   <!-- Footer -->
   <footer class="sticky-footer bg-white">

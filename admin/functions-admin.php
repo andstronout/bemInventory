@@ -87,6 +87,8 @@ function hapusBarang($id)
   return mysqli_affected_rows($conn);
 }
 
+
+// acc Peminjaman
 function accPinjam($data)
 {
   $conn = koneksi();

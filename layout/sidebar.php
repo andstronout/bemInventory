@@ -41,7 +41,7 @@
         <span>Daftar Peminjaman</span></a>
     </li>
     <li class="nav-item active">
-      <a class="nav-link" href="daftar-kembali.php">
+      <a class="nav-link" href="daftar-balik.php">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Daftar Pengembalian</span></a>
     </li>
