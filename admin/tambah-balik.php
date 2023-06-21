@@ -1,11 +1,16 @@
 <?php
+
 require 'functions-admin.php';
 $koneksi = koneksi();
 
 if (!isset($_SESSION["login"])) {
   header("Location: login.php");
 }
+
+
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +44,17 @@ if (!isset($_SESSION["login"])) {
 
   <?php include("../layout/sidebar.php"); ?>
 
+  <?php
+  $s = $_POST['id_pinjam'];
+  $x = explode('-', $s, 2);
+  $id = $x[1];
+
+  $query = $koneksi->query("SELECT * FROM peminjaman INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user WHERE id_pinjam='$id'");
+  $row = $query->fetch_array();
+
+
+
+  ?>
   <!-- Begin Page Content -->
   <div class="container-fluid">
 
@@ -56,79 +72,68 @@ if (!isset($_SESSION["login"])) {
         <div class="card shadow mb-4">
           <div class="card-body">
             <form method="POST">
+              <input type="hidden" value="<?= $row['id_pinjam']; ?>" name="id_pinjam">
+              <input type="hidden" value="<?= $row['id_produk']; ?>" name="id_produk">
+              <input type="hidden" value="<?= $row['jumlah_barang']; ?>" name="jumlah_barang">
               <div class="mb-3">
+
                 <label for="select-barang" class="form-label">Nama Barang</label>
-                <select class="form-select" aria-label=".form-select-lg example" id="select-barang" placeholder="Pick a state..." name="id_p">
-                  <option value="">-- Pilih Barang --</option>
-                  <?php
-                  $sq = $koneksi->query("select * from stok_barang");
-                  while ($data = $sq->fetch_assoc()) {
-                    echo "<option value='$data[id_produk]'>$data[nama_barang]</option>";
-                  }
-                  ?>
-                </select>
+                <input type="nama_barang" class="form-control" id="exampleInputjumlah1" aria-describedby="jumlahHelp" value="<?= $row['nama_barang']; ?>" name="nama_barang" readonly>
               </div>
               <div class="mb-3">
                 <label for="exampleInputjumlah1" class="form-label">Jumlah Barang Yang Dipinjam</label>
-                <input type="jumlah" class="form-control" id="exampleInputjumlah1" aria-describedby="jumlahHelp" name="jumlah_pinjam" required>
+                <input type="jumlah" class="form-control" id="exampleInputjumlah1" aria-describedby="jumlahHelp" value="<?= $row['jumlah_pinjam']; ?>" name="jumlah_balik" readonly>
               </div>
               <div class="mb-3">
                 <label for="select-user" class="form-label">UKM Peminjam</label>
-                <select class="form-select" aria-label=".form-select-lg example" id="select-user" placeholder="Pick a state..." name="id_u">
-                  <option value="">-- Pilih Nama UKM --</option>
-                  <?php
-
-                  $sq = $koneksi->query("select * from user");
-                  while ($data = $sq->fetch_assoc()) {
-                    echo "<option value='$data[id_user]'>$data[nama]</option>";
-                  }
-                  ?>
-
-                </select>
+                <input type="text" class="form-control" value="<?= $row['nama']; ?>" name="nama" readonly>
               </div>
               <div class="mb-3">
                 <label for="exampleInputTangal" class="form-label">Tanggal Pinjam</label>
-                <input type="date" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required>
+                <input type="text" class="form-control" value="<?= $row['tanggal_pinjam']; ?>" name="tanggal_balik" readonly>
               </div>
-              <input type="hidden" name="status" value="Belum Diproses">
               <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
             </form>
           </div>
         </div>
-
       </div>
-      <!-- /.container-fluid -->
     </div>
-
   </div>
   <!-- /.container-fluid -->
 
-  </div>
-  <!-- End of Main Content -->
-
   <?php
-  if (isset($_POST["simpan"])) {
-    $status = 'Belum Terproses';
+  $cek = $_POST['id_pinjam'];
+  $t = time();
+  $time = date("Y-m-d", $t);
+  $pinjam = $koneksi->query("select * from pengembalian where id_pinjam='$cek'");
+  while ($hpinjam = $pinjam->fetch_array()) {
+    $hasil = $hpinjam;
+  }
 
-    if ($data['jumlah_barang'] > 0) {
-      $s = mysqli_query($koneksi, "INSERT INTO peminjaman 
-    (id_produk,id_user,jumlah_pinjam,tanggal_pinjam,`status`) VALUES 
-    ('$_POST[id_p]','$_POST[id_u]','$_POST[jumlah_pinjam]','$_POST[tanggal_pinjam]','$status')")
-        or die(mysqli_error($koneksi));
+  if (isset($_POST['simpan'])) {
+    $jumlahBarang = $_POST['jumlah_barang'];
+    $totalJumlah = $jumlahBarang + $_POST['jumlah_balik'];
+    $id = $_POST['id_produk'];
+
+    // cek udah di input blum
+    if ($cek !== $hasil['id_pinjam']) {
+
+      $tambah = $koneksi->query("INSERT INTO pengembalian (id_pinjam,jumlah_balik,tanggal_balik) VALUES ('$_POST[id_pinjam]','$_POST[jumlah_balik]','$time')") or die($koneksi->connect_error);
+      $jumlah = $koneksi->query("UPDATE stok_barang SET jumlah_barang='$totalJumlah' WHERE id_produk='$id'") or die($koneksi->connect_error);
 
       echo "
       <script>
         alert('data berhasil diubah!');
-        document.location.href = 'daftar-pinjam.php';
+        document.location.href = 'daftar-balik.php';
       </script>
     ";
     } else {
       echo "
-      <script>
-        alert('Barang Kosong!');
-        document.location.href = 'daftar-pinjam.php';
-      </script>
-    ";
+        <script>
+          alert('data gagal diubah!');
+          document.location.href = 'daftar-balik.php';
+        </script>
+      ";
     }
   }
 

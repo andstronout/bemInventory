@@ -67,6 +67,7 @@ if (!isset($_SESSION["login"])) {
                 <thead>
                   <tr>
                     <th>No</th>
+                    <th>Kode Pinjam</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
                     <th>User</th>
@@ -83,6 +84,7 @@ if (!isset($_SESSION["login"])) {
                   ?>
                     <tr>
                       <td><?= $no++; ?></td>
+                      <td><?= 'bem-' . $data['id_pinjam']; ?></td>
                       <td><?= $data['nama_barang']; ?></td>
                       <td><?= $data['jumlah_pinjam']; ?></td>
                       <td><?= $data['nama']; ?></td>
@@ -188,9 +190,20 @@ if (!isset($_SESSION["login"])) {
     $(document).ready(function() {
       $('#data-Table').DataTable({
         dom: 'Bfrtip',
-        buttons: [
-          'excelHtml5',
-          'pdfHtml5'
+        buttons: [{
+            extend: 'excelHtml5',
+            title: 'Data Peminjaman Barang',
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 5, 6]
+            }
+          },
+          {
+            extend: 'pdfHtml5',
+            title: 'Data Peminjaman Barang',
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 5, 6]
+            }
+          }
         ]
       });
     });

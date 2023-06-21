@@ -183,11 +183,20 @@ if (!isset($_SESSION["login"])) {
     $(document).ready(function() {
       $('#data-Table').DataTable({
         dom: 'Bfrtip',
-        buttons: [
-          'copyHtml5',
-          'excelHtml5',
-          'csvHtml5',
-          'pdfHtml5'
+        buttons: [{
+            extend: 'excelHtml5',
+            title: 'Data Anggota UKM',
+            exportOptions: {
+              columns: [0, 1, 2]
+            }
+          },
+          {
+            extend: 'pdfHtml5',
+            title: 'Data Anggota UKM',
+            exportOptions: {
+              columns: [0, 1, 2]
+            }
+          }
         ]
       });
     });

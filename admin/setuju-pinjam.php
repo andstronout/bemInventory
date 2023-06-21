@@ -9,8 +9,9 @@ if (!isset($_SESSION["login"])) {
 
 $query = "SELECT * FROM peminjaman INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user WHERE id_pinjam ='$id'";
 
-$sql = mysqli_query($koneksi, $query);
-$tampil = mysqli_fetch_assoc($sql);
+$sql = $koneksi->query($query);
+$tampil = $sql->fetch_assoc();
+
 ?>
 
 <!DOCTYPE html>
@@ -63,9 +64,11 @@ $tampil = mysqli_fetch_assoc($sql);
           <div class="card-body">
             <form method="POST">
               <input type="hidden" name="id_pinjam" value="<?= $id; ?>">
+              <input type="hidden" name="jumlah_barang" value="<?= $tampil['jumlah_barang']; ?>">
+              <input type="hidden" name="id_produk" value="<?= $tampil['id_produk']; ?>">
               <div class="mb-3">
                 <label for="exampleInputName1" class="form-label">Nama Barang</label>
-                <input type="nama" class="form-control" id="exampleInputName1" aria-describedby="nameHelp" name="nama_barang" required value="<?= $tampil['nama_barang']; ?>">
+                <input type="nama" class="form-control" id="exampleInputName1" aria-describedby="nameHelp" name="nama_barang" readonly value="<?= $tampil['nama_barang']; ?>">
               </div>
               <div class="mb-3">
                 <label for="exampleInputjumlah1" class="form-label">Jumlah Barang Yang Dipinjam</label>
@@ -73,23 +76,18 @@ $tampil = mysqli_fetch_assoc($sql);
               </div>
               <div class="mb-3">
                 <label for="exampleInputUser" class="form-label">UKM Peminjam</label>
-                <input type="nama" class="form-control" id="exampleInputUser" aria-describedby="userHelp" name="nama" required value="<?= $tampil['nama']; ?>">
+                <input type="nama" class="form-control" id="exampleInputUser" aria-describedby="userHelp" name="nama" readonly autocomplete="false" value="<?= $tampil['nama']; ?>">
               </div>
               <div class="mb-3">
                 <label for="exampleInputTangal" class="form-label">Tanggal Pinjam</label>
-                <input type="date" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required value="<?= $tampil['tanggal_pinjam']; ?>">
+                <input type="text" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required value="<?= $tampil['tanggal_pinjam']; ?>" readonly>
               </div>
               <div class="mb-3">
                 <label for="exampleInputStatus" class="form-label">Status</label>
-                <br>
-                <select class="form-select" aria-label=".form-select-lg example" name="status">
-                  <option selected><?= $tampil['status']; ?></option>
-                  <option value="Belum Diproses">Belum Diproses</option>
-                  <option value="Sudah Diproses">Sudah Diproses</option>
-                  <option value="Sudah Dikembalikan">Sudah Dikembalikan</option>
-                </select>
+                <input type="text" class="form-control" readonly value="<?= $tampil['status']; ?>" name="status">
               </div>
-              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+              <button type="submit" class="btn btn-primary" name="simpan">Setujui Peminjaman</button>
+              <button type="submit" class="btn btn-danger" name="tolak">Tolak Peminjaman</button>
             </form>
           </div>
         </div>
@@ -107,24 +105,49 @@ $tampil = mysqli_fetch_assoc($sql);
   <?php
   if (isset($_POST["simpan"])) {
 
-    // cek apakah data berhasil diubah atau tidak
-    if (accPinjam($_POST) > 0) {
+    $noAcc = $_POST['status'];
+    $isAcc = 'Sudah Terproses';
+    $id = $_POST['id_pinjam'];
+    $idProduk = $_POST['id_produk'];
+    $jumlah = $_POST['jumlah_barang'];
+    $pinjam = $_POST['jumlah_pinjam'];
+    $total = $jumlah - $pinjam;
+
+    // udah diproses blom
+    if ($noAcc != $isAcc) {
+
+      $update = $koneksi->query("UPDATE peminjaman SET `status`='$isAcc' WHERE id_pinjam='$id' ");
+      $total = $koneksi->query("UPDATE stok_barang SET jumlah_barang='$total' WHERE id_produk=$idProduk");
+
       echo "
             <script>
-              alert('data berhasil diubah!');
+              alert('Approval Berhasil');
               document.location.href = 'daftar-pinjam.php';
             </script>
           ";
     } else {
       echo "
             <script>
-              alert('data gagal diubah!');
+              alert('Approval hanya boleh dilakukan sekali');
               document.location.href = 'daftar-pinjam.php';
             </script>
           ";
     }
   }
+
+  if (isset($_POST["tolak"])) {
+    $decline = 'Peminjaman Ditolak';
+    $id = $_POST['id_pinjam'];
+    $tolak = $koneksi->query("UPDATE peminjaman SET `status`='$decline' WHERE id_pinjam='$id'");
+    echo "
+          <script>
+              alert('Peminjaman berhasil Ditolak');
+              document.location.href ='daftar-pinjam.php';
+          </script>
+    ";
+  }
   ?>
+
 
   <!-- Footer -->
   <footer class="sticky-footer bg-white">

@@ -35,47 +35,15 @@ if (isset($_POST['simpan'])) {
   //       window.location.href = "daftar-pinjam.php";
   //     
 </script>
-// <?php
-    //   }
-    // }
+// <?php {
+      $sekarang = $data['jumlah_barang'] - $_POST['jumlah_pinjam'];
+      $updatestok = mysqli_query($koneksi, "UPDATE peminjaman SET jumlah_barang='$sekarang' WHERE id_produk='$_POST[id_p]'") or die(mysqli_error($koneksi));
+    }
 
-    {
-    echo "
-    <script>
-      alert('data berhasil diubah!');
-      document.location.href = 'daftar-pinjam.php';
-    </script>
-  ";
-} else {
-echo "
-    <script>
-      alert('data gagal diubah!');
-      document.location.href = 'daftar-pinjam.php';
-    </script>
-  ";
-}
-
-$sekarang = $data['jumlah_barang'] - $_POST['jumlah_pinjam'];
-$updatestok = mysqli_query($koneksi, "UPDATE peminjaman SET jumlah_barang='$sekarang' WHERE id_produk='$_POST[id_p]'") or die(mysqli_error($koneksi));
-}
-
-// if ($dp['jumlah_barang'] > 0) {
-    //   $s = mysqli_query($koneksi, "INSERT INTO peminjaman 
-    // (id_produk,id_user,jumlah_pinjam,tanggal_pinjam,`status`) VALUES 
-    // ('$_POST[id_p]','$_POST[id_u]','$_POST[jumlah_pinjam]','$_POST[tanggal_pinjam]','$status')")
-    //     or die(mysqli_error($koneksi));
-
-    //   echo "
-    //   <script>
-    //     alert('data berhasil diubah!');
-    //     document.location.href = 'daftar-pinjam.php';
-    //   </script>
-    // ";
-    // } else {
-    //   echo "
-    //   <script>
-    //     alert('Barang Kosong!');
-    //     document.location.href = 'daftar-pinjam.php';
-    //   </script>
-    // ";
+// 
+    // $sq = mysqli_query($koneksi, "select * from stok_barang");
+    // while ($dp = mysqli_fetch_array($sq)) {
+    //   $idp = $dp['id_produk'];
+    //   $dpm = $dp['nama_barang'];
+    //   var_dump($idp, $dpm);
     // }

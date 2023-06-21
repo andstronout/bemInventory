@@ -57,15 +57,17 @@ if (!isset($_SESSION["login"])) {
           <div class="card-body">
             <form method="POST">
               <div class="mb-3">
+
                 <label for="select-barang" class="form-label">Nama Barang</label>
                 <select class="form-select" aria-label=".form-select-lg example" id="select-barang" placeholder="Pick a state..." name="id_p">
                   <option value="">-- Pilih Barang --</option>
                   <?php
                   $sq = $koneksi->query("select * from stok_barang");
-                  while ($dp = $sq->fetch_assoc()) {
-                    echo "<option value='$dp[id_produk]'>$dp[nama_barang]</option>";
+                  while ($data = $sq->fetch_assoc()) {
+                    echo "<option value='$data[id_produk]'>$data[nama_barang]</option>";
                   }
                   ?>
+
                 </select>
               </div>
               <div class="mb-3">
@@ -77,7 +79,6 @@ if (!isset($_SESSION["login"])) {
                 <select class="form-select" aria-label=".form-select-lg example" id="select-user" placeholder="Pick a state..." name="id_u">
                   <option value="">-- Pilih Nama UKM --</option>
                   <?php
-
                   $sq = $koneksi->query("select * from user");
                   while ($data = $sq->fetch_assoc()) {
                     echo "<option value='$data[id_user]'>$data[nama]</option>";
@@ -108,12 +109,40 @@ if (!isset($_SESSION["login"])) {
   <?php
   if (isset($_POST["simpan"])) {
     $status = 'Belum Terproses';
-    $id = $dp['id_produk'];
-    $sq = $koneksi->query("select * from stok_barang where id_produk=$id");
-    while ($dt = $sq->fetch_assoc()) {
-      $jumlah = $dt['jumlah_barang'];
+    $idp = $_POST['id_p'];
+
+    $sq = mysqli_query($koneksi, "select * from stok_barang where id_produk='$idp'");
+    while ($dp = mysqli_fetch_array($sq)) {
+      $jumlah = $dp['jumlah_barang'];
     }
-    var_dump($jumlah);
+
+    if ($jumlah > $_POST['jumlah_pinjam']) {
+      $s = mysqli_query($koneksi, "INSERT INTO peminjaman 
+      (id_produk,id_user,jumlah_pinjam,tanggal_pinjam,`status`) VALUES 
+      ('$_POST[id_p]','$_POST[id_u]','$_POST[jumlah_pinjam]','$_POST[tanggal_pinjam]','$status')")
+        or die(mysqli_error($koneksi));
+
+      echo "
+        <script>
+          alert('data berhasil diubah!');
+          document.location.href = 'daftar-pinjam.php';
+        </script>
+      ";
+    } elseif ($jumlah = 0) {
+      echo "
+        <script>
+          alert('Barang Kosong!');
+          document.location.href = 'daftar-pinjam.php';
+        </script>
+      ";
+    } else {
+      echo "
+        <script>
+          alert('Jumlah Pinjam melewati stok!');
+          document.location.href = 'daftar-pinjam.php';
+        </script>
+      ";
+    }
   }
 
   ?>
