@@ -1,6 +1,8 @@
 <?php
-require 'functions-admin.php';
+session_start();
+require 'functions.php';
 $koneksi = koneksi();
+
 if (!isset($_SESSION["login"])) {
   header("Location: login.php");
 }
@@ -25,9 +27,6 @@ if (!isset($_SESSION["login"])) {
   <link href="../sbAdmin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-  <!-- bootsrap 5 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
   <!-- Custom styles for this template-->
   <link href="../sbAdmin/css/sb-admin-2.min.css" rel="stylesheet">
 
@@ -41,19 +40,16 @@ if (!isset($_SESSION["login"])) {
 
 <body id="page-top">
 
-  <?php include("../layout/sidebar.php"); ?>
+  <?php include("../layout/sidebar-user.php"); ?>
 
   <!-- Begin Page Content -->
   <div class="container-fluid">
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-      <h1 class="h3 mb-0 text-gray-800">Daftar Pengembalian Barang</h1>
+      <h1 class="h3 mb-0 text-gray-800">Daftar Barang Inventaris</h1>
       <div class="my-2"></div>
-      <!-- Button trigger modal -->
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Pengembalian Barang
-      </button>
+
     </div>
 
     <!-- Content Row -->
@@ -70,29 +66,23 @@ if (!isset($_SESSION["login"])) {
                     <th>No</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
-                    <th>User</th>
-                    <th>Tanggal balik</th>
-                    <th>Aksi</th>
+                    <th>Tanggal Masuk</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php
-                  $tolak = 'Peminjaman Ditolak';
-                  $sql = $koneksi->query("SELECT * FROM pengembalian INNER JOIN peminjaman ON pengembalian.id_pinjam=peminjaman.id_pinjam INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user WHERE `status` != '$tolak'");
+                  $sql = mysqli_query($koneksi, "SELECT * FROM stok_barang");
                   $no = 1;
-                  while ($data = $sql->fetch_array()) {
-
+                  while ($data = mysqli_fetch_assoc($sql)) {
                   ?>
                     <tr>
                       <td><?= $no++; ?></td>
                       <td><?= $data['nama_barang']; ?></td>
-                      <td><?= $data['jumlah_pinjam']; ?></td>
-                      <td><?= $data['nama']; ?></td>
-                      <td><?= $data['tanggal_balik']; ?></td>
-                      <td><button class="btn btn-info">Cetak Form</button></td>
-                    <?php
-                  }
-                    ?>
+                      <td><?= $data['jumlah_barang']; ?></td>
+                      <td><?= $data['tanggal_masuk']; ?></td>
+
+                    <?php } ?>
+                    </tr>
                     </tr>
                 </tbody>
               </table>
@@ -150,33 +140,6 @@ if (!isset($_SESSION["login"])) {
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Pengembalian Barang</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Masukan Kode Peminjaman</p>
-          <div class="mb-3">
-            <form action="tambah-balik.php" method="post">
-              <label for="exampleInputKode" class="form-label">Kode Pinjam</label>
-              <input type="text" class="form-control" id="exampleInputKode" aria-describedby="textHelp" name="id_pinjam" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
 
   <!-- Bootstrap core JavaScript-->
   <script src="../sbAdmin/vendor/jquery/jquery.min.js"></script>
@@ -187,13 +150,6 @@ if (!isset($_SESSION["login"])) {
 
   <!-- Custom scripts for all pages-->
   <script src="../sbAdmin/js/sb-admin-2.min.js"></script>
-
-  <!-- Page level plugins -->
-  <script src="../sbAdmin/vendor/chart.js/Chart.min.js"></script>
-
-  <!-- Page level custom scripts -->
-  <script src="../sbAdmin/js/demo/chart-area-demo.js"></script>
-  <script src="../sbAdmin/js/demo/chart-pie-demo.js"></script>
 
   <!-- Page level plugins -->
   <script src="../sbAdmin/vendor/datatables/jquery.dataTables.min.js"></script>
@@ -208,24 +164,7 @@ if (!isset($_SESSION["login"])) {
   <script src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/datatables.min.js"></script>
   <script>
     $(document).ready(function() {
-      $('#data-Table').DataTable({
-        dom: 'Bfrtip',
-        buttons: [{
-            extend: 'excelHtml5',
-            title: 'Data Pengembalian Barang',
-            exportOptions: {
-              columns: [0, 1, 2, 3, 4]
-            }
-          },
-          {
-            extend: 'pdfHtml5',
-            title: 'Data Pengembalian Barang',
-            exportOptions: {
-              columns: [0, 1, 2, 3, 4]
-            }
-          }
-        ]
-      });
+      $('#data-Table').DataTable({});
     });
   </script>
 

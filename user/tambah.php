@@ -1,11 +1,11 @@
 <?php
-require 'functions-admin.php';
+session_start();
+require 'functions.php';
 $koneksi = koneksi();
+
 if (!isset($_SESSION["login"])) {
   header("Location: login.php");
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -31,28 +31,22 @@ if (!isset($_SESSION["login"])) {
   <!-- Custom styles for this page -->
   <link href="../sbAdmin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-  <!-- dataTable URL -->
-  <link href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/datatables.min.css" rel="stylesheet" />
+  <!-- Bootstrap Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 </head>
 
 <body id="page-top">
 
-  <?php include("../layout/sidebar.php"); ?>
+  <?php include("../layout/sidebar-user.php"); ?>
 
   <!-- Begin Page Content -->
   <div class="container-fluid">
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-      <h1 class="h3 mb-0 text-gray-800">Daftar Peminjaman Barang</h1>
+      <h1 class="h3 mb-0 text-gray-800">Form Peminjaman Barang</h1>
       <div class="my-2"></div>
-      <a href="tambah-pinjam.php" class="btn btn-info btn-icon-split">
-        <span class="icon text-white-50">
-          <i class="fas fa-info-circle"></i>
-        </span>
-        <span class="text">Pinjam Barang</span>
-      </a>
     </div>
 
     <!-- Content Row -->
@@ -62,51 +56,38 @@ if (!isset($_SESSION["login"])) {
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-bordered" id="data-Table" width="100%" cellspacing="0">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Kode Pinjam</th>
-                    <th>Nama Barang</th>
-                    <th>Jumlah</th>
-                    <th>User</th>
-                    <th>Tanggal Pinjam</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <form method="POST">
+              <div class="mb-3">
+
+                <label for="select-barang" class="form-label">Nama Barang</label>
+                <select class="form-select" aria-label=".form-select-lg example" id="select-barang" placeholder="Pick a state..." name="id_p">
+                  <option value="">-- Pilih Barang --</option>
                   <?php
-                  $sql = mysqli_query($koneksi, "SELECT * FROM peminjaman INNER JOIN stok_barang ON peminjaman.id_produk=stok_barang.id_produk INNER JOIN user ON peminjaman.id_user=user.id_user ORDER BY tanggal_pinjam DESC");
-                  $no = 1;
-                  while ($data = mysqli_fetch_assoc($sql)) {
+                  $sq = $koneksi->query("select * from stok_barang");
+                  while ($data = $sq->fetch_assoc()) {
+                    echo "<option value='$data[id_produk]'>$data[nama_barang]</option>";
+                  }
                   ?>
-                    <tr>
-                      <td><?= $no++; ?></td>
-                      <td><?= 'BEMIDN-' . $data['id_pinjam']; ?></td>
-                      <td><?= $data['nama_barang']; ?></td>
-                      <td><?= $data['jumlah_pinjam']; ?></td>
-                      <td><?= $data['nama']; ?></td>
-                      <td><?= $data['tanggal_pinjam']; ?></td>
-                      <td><?= $data['status']; ?></td>
-                      <td>
-                        <a href="setuju-pinjam.php?id=<?= $data['id_pinjam']; ?>" class="btn btn-info btn-icon-split btn-sm">
-                          <span class="icon text-white-50">
-                            <i class="fas fa-info-circle"></i>
-                          </span>
-                          <span class="text">Proses</span>
-                        </a>
-                      </td>
-                    <?php } ?>
-                    </tr>
-                    </tr>
-                </tbody>
-              </table>
-            </div>
+
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputjumlah1" class="form-label">Jumlah Barang Yang Dipinjam</label>
+                <input type="jumlah" class="form-control" id="exampleInputjumlah1" aria-describedby="jumlahHelp" name="jumlah_pinjam" required>
+              </div>
+              <div class="mb-3">
+                <label for="select-user" class="form-label">UKM Peminjam</label>
+                <input type="text" name="" value="<?= $_SESSION['nama']; ?>" class="form-control" readonly>
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputTangal" class="form-label">Tanggal Pinjam</label>
+                <input type="date" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required>
+              </div>
+              <input type="hidden" name="status" value="Belum Diproses">
+              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+            </form>
           </div>
         </div>
-
       </div>
       <!-- /.container-fluid -->
     </div>
@@ -116,6 +97,48 @@ if (!isset($_SESSION["login"])) {
 
   </div>
   <!-- End of Main Content -->
+
+  <?php
+  if (isset($_POST["simpan"])) {
+    $status = 'Belum Terproses';
+    $idp = $_POST['id_p'];
+    $idu = $_SESSION['idu'];
+
+    $sq = mysqli_query($koneksi, "select * from stok_barang where id_produk='$idp'");
+    while ($dp = mysqli_fetch_array($sq)) {
+      $jumlah = $dp['jumlah_barang'];
+    }
+
+    if ($jumlah > $_POST['jumlah_pinjam']) {
+      $s = mysqli_query($koneksi, "INSERT INTO peminjaman 
+      (id_produk,id_user,jumlah_pinjam,tanggal_pinjam,`status`) VALUES 
+      ('$_POST[id_p]','$idu','$_POST[jumlah_pinjam]','$_POST[tanggal_pinjam]','$status')")
+        or die(mysqli_error($koneksi));
+
+      echo "
+        <script>
+          alert('data berhasil diubah!');
+          document.location.href = 'pinjam.php';
+        </script>
+      ";
+    } elseif ($jumlah = 0) {
+      echo "
+        <script>
+          alert('Barang Kosong!');
+          document.location.href = 'pinjam.php';
+        </script>
+      ";
+    } else {
+      echo "
+        <script>
+          alert('Jumlah Pinjam melewati stok!');
+          document.location.href = 'pinjam.php';
+        </script>
+      ";
+    }
+  }
+
+  ?>
 
   <!-- Footer -->
   <footer class="sticky-footer bg-white">
@@ -181,33 +204,6 @@ if (!isset($_SESSION["login"])) {
 
   <!-- Page level custom scripts -->
   <script src="../sbAdmin/js/demo/datatables-demo.js"></script>
-
-  <!-- dataTable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-  <script src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/datatables.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $('#data-Table').DataTable({
-        dom: 'Bfrtip',
-        buttons: [{
-            extend: 'excelHtml5',
-            title: 'Data Peminjaman Barang',
-            exportOptions: {
-              columns: [0, 1, 2, 3, 4, 5, 6]
-            }
-          },
-          {
-            extend: 'pdfHtml5',
-            title: 'Data Peminjaman Barang',
-            exportOptions: {
-              columns: [0, 1, 2, 3, 4, 5, 6]
-            }
-          }
-        ]
-      });
-    });
-  </script>
 
 </body>
 
