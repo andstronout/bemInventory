@@ -84,7 +84,7 @@ if (!isset($_SESSION["login"])) {
                 <input type="date" class="form-control" id="exampleInputTangal" aria-describedby="dateHelp" name="tanggal_pinjam" required>
               </div>
               <input type="hidden" name="status" value="Belum Diproses">
-              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+              <button type="submit" class="btn btn-success col-2 " name="simpan">Simpan</button>
             </form>
           </div>
         </div>

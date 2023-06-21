@@ -34,6 +34,8 @@ if (!isset($_SESSION["login"])) {
   <!-- dataTable URL -->
   <link href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/datatables.min.css" rel="stylesheet" />
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body id="page-top">
@@ -49,7 +51,7 @@ if (!isset($_SESSION["login"])) {
       <div class="my-2"></div>
       <a href="tambah-pinjam.php" class="btn btn-info btn-icon-split">
         <span class="icon text-white-50">
-          <i class="fas fa-info-circle"></i>
+          <i class="fa-solid fa-plus"></i>
         </span>
         <span class="text">Pinjam Barang</span>
       </a>

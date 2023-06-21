@@ -37,6 +37,7 @@ if (!isset($_SESSION["login"])) {
   <!-- dataTable URL -->
   <link href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/datatables.min.css" rel="stylesheet" />
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body id="page-top">
@@ -51,7 +52,8 @@ if (!isset($_SESSION["login"])) {
       <h1 class="h3 mb-0 text-gray-800">Daftar Pengembalian Barang</h1>
       <div class="my-2"></div>
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal">
+        <i class="fa-solid fa-plus"></i>
         Pengembalian Barang
       </button>
     </div>
@@ -72,7 +74,6 @@ if (!isset($_SESSION["login"])) {
                     <th>Jumlah</th>
                     <th>User</th>
                     <th>Tanggal balik</th>
-                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -89,7 +90,6 @@ if (!isset($_SESSION["login"])) {
                       <td><?= $data['jumlah_pinjam']; ?></td>
                       <td><?= $data['nama']; ?></td>
                       <td><?= $data['tanggal_balik']; ?></td>
-                      <td><button class="btn btn-info">Cetak Form</button></td>
                     <?php
                   }
                     ?>
@@ -170,7 +170,7 @@ if (!isset($_SESSION["login"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-info">Cari Kode Booking</button>
           </form>
         </div>
       </div>

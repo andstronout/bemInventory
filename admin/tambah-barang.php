@@ -32,6 +32,8 @@ if (!isset($_SESSION["login"])) {
   <!-- Custom styles for this page -->
   <link href="../sbAdmin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body id="page-top">
@@ -63,7 +65,7 @@ if (!isset($_SESSION["login"])) {
                 <label for="exampleInputEmail1" class="form-label">Jumlah Barang</label>
                 <input type="jumlah_barang" class="form-control" id="exampleInputjumlah_barang1" aria-describedby="jumlah_barangHelp" placeholder="Masukan jumlah barang" name="jumlah_barang" required>
               </div>
-              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+              <button type="submit" class="btn btn-success col-2" name="simpan">Simpan</button>
             </form>
           </div>
         </div>

@@ -32,6 +32,8 @@ if (!isset($_SESSION["login"])) {
   <!-- Custom styles for this page -->
   <link href="../sbAdmin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body id="page-top">
@@ -67,7 +69,8 @@ if (!isset($_SESSION["login"])) {
                 <label for="exampleInputPassword1" class="form-label">Password</label>
                 <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Masukan Password" name="password" required>
               </div>
-              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+              <button type="submit" class="btn btn-success col-2 " name="simpan">Simpan</button>
+
             </form>
           </div>
         </div>
@@ -159,6 +162,8 @@ if (!isset($_SESSION["login"])) {
 
   <!-- Page level custom scripts -->
   <script src="../sbAdmin/js/demo/datatables-demo.js"></script>
+
+  <script src="https://kit.fontawesome.com/d7008edd9b.js" crossorigin="anonymous"></script>
 
 </body>
 

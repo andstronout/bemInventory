@@ -92,7 +92,7 @@ if (!isset($_SESSION["login"])) {
                 <label for="exampleInputTangal" class="form-label">Tanggal Pinjam</label>
                 <input type="text" class="form-control" value="<?= $row['tanggal_pinjam']; ?>" name="tanggal_balik" readonly>
               </div>
-              <button type="submit" class="btn btn-primary" name="simpan">Submit</button>
+              <button type="submit" class="btn btn-success col-2 " name="simpan">Simpan</button>
             </form>
           </div>
         </div>
